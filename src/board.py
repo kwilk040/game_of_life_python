@@ -37,3 +37,6 @@ class Board:
 
     def change_cell_state(self, x: int, y: int):
         self.current_generation[x, y] = not self.current_generation[x, y]
+
+    def set_cell_state(self, x: int, y: int, cell_state: CellState):
+        self.current_generation[x, y] = cell_state
