@@ -38,7 +38,7 @@ import pygame
 import numpy as np
 
 from rule import Rule, Ruleset, RulesetFactory
-from cell import CellState
+from board import Board
 
 # Initialize Pygame
 pygame.init()
@@ -52,11 +52,6 @@ n_cells_x, n_cells_y = 40, 30
 cell_width = width // n_cells_x
 cell_height = height // n_cells_y
 
-# Game state
-game_state = np.random.choice(
-    [CellState.DEAD, CellState.ALIVE], size=(n_cells_x, n_cells_y), p=[0.8, 0.2]
-)
-
 # Colors
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -68,6 +63,7 @@ button_width, button_height = 200, 50
 button_x, button_y = (width - button_width) // 2, height - button_height - 10
 
 ruleset: Ruleset = RulesetFactory.get_ruleset(Rule.CONWAYS_LIFE)
+board: Board = Board(n_cells_x, n_cells_y, ruleset)
 
 
 def draw_button():
@@ -87,35 +83,12 @@ def draw_grid():
             pygame.draw.rect(screen, gray, cell, 1)
 
 
-def next_generation():
-    global game_state
-    new_state = np.copy(game_state)
-
-    for y in range(n_cells_y):
-        for x in range(n_cells_x):
-            n_neighbors: int = int(
-                (
-                        game_state[(x - 1) % n_cells_x, (y - 1) % n_cells_y]
-                        + game_state[(x) % n_cells_x, (y - 1) % n_cells_y]
-                        + game_state[(x + 1) % n_cells_x, (y - 1) % n_cells_y]
-                        + game_state[(x - 1) % n_cells_x, (y) % n_cells_y]
-                        + game_state[(x + 1) % n_cells_x, (y) % n_cells_y]
-                        + game_state[(x - 1) % n_cells_x, (y + 1) % n_cells_y]
-                        + game_state[(x) % n_cells_x, (y + 1) % n_cells_y]
-                        + game_state[(x + 1) % n_cells_x, (y + 1) % n_cells_y]
-                )
-            )
-
-            new_state[x, y] = ruleset.apply(CellState(game_state[x, y]), n_neighbors)
-
-    game_state = new_state
-
-
 def draw_cells():
+    current_generation: np.ndarray = board.get_current_generation()
     for y in range(n_cells_y):
         for x in range(n_cells_x):
             cell = pygame.Rect(x * cell_width, y * cell_height, cell_width, cell_height)
-            if game_state[x, y] == 1:
+            if current_generation[x, y] == 1:
                 pygame.draw.rect(screen, black, cell)
 
 
@@ -135,9 +108,9 @@ while running:
                     button_x <= event.pos[0] <= button_x + button_width
                     and button_y <= event.pos[1] <= button_y + button_height
             ):
-                next_generation()
+                board.next_generation()
             else:
                 x, y = event.pos[0] // cell_width, event.pos[1] // cell_height
-                game_state[x, y] = not game_state[x, y]
+                board.change_cell_state(x, y)
 
 pygame.quit()
