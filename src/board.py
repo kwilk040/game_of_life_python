@@ -40,3 +40,7 @@ class Board:
 
     def set_cell_state(self, x: int, y: int, cell_state: CellState):
         self.current_generation[x, y] = cell_state
+
+    def randomize_board(self):
+        self.current_generation = np.random.choice([CellState.DEAD, CellState.ALIVE],
+                                                   size=(self.n_cells_x, self.n_cells_y), p=[0.8, 0.2])
