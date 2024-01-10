@@ -28,85 +28,55 @@
 #    and combine them into a complete application
 # 6. Refine if needed
 
-# Deadline - 15th of December 2023
+# Deadline - 14th of January 2024)
 # Mail with:
 # 1. short screen recording demonstrating the new features
 # 2. Linked code
 # 3. Short description of the changes. Which design patterns you used and how you applied them.
 
 import pygame
-import numpy as np
 
 from rule import Rule, Ruleset, RulesetFactory
 from board import Board
+from ui import RendererSettings, PygameRenderer, Color, Button
 
 # Initialize Pygame
 pygame.init()
 
 # Screen dimensions
-width, height = 800, 600
+width, height = 1000, 1000
 screen = pygame.display.set_mode((width, height))
 
 # Grid dimensions
-n_cells_x, n_cells_y = 40, 30
+n_cells_x, n_cells_y = 100, 100
 cell_width = width // n_cells_x
 cell_height = height // n_cells_y
-
-# Colors
-white = (255, 255, 255)
-black = (0, 0, 0)
-gray = (128, 128, 128)
-green = (0, 255, 0)
 
 # Button dimensions
 button_width, button_height = 200, 50
 button_x, button_y = (width - button_width) // 2, height - button_height - 10
 
+next_generation_button: Button = Button(button_x, button_y, button_width, button_height, Color.MUTED, "Next generation")
+
 ruleset: Ruleset = RulesetFactory.get_ruleset(Rule.CONWAYS_LIFE)
 board: Board = Board(n_cells_x, n_cells_y, ruleset)
+renderer_settings: RendererSettings = RendererSettings(height, width, n_cells_x, n_cells_y, cell_height, cell_width)
+renderer: PygameRenderer = PygameRenderer(screen, renderer_settings, [next_generation_button])
 
-
-def draw_button():
-    pygame.draw.rect(screen, green, (button_x, button_y, button_width, button_height))
-    font = pygame.font.Font(None, 36)
-    text = font.render("Next Generation", True, black)
-    text_rect = text.get_rect(
-        center=(button_x + button_width // 2, button_y + button_height // 2)
-    )
-    screen.blit(text, text_rect)
-
-
-def draw_grid():
-    for y in range(0, height, cell_height):
-        for x in range(0, width, cell_width):
-            cell = pygame.Rect(x, y, cell_width, cell_height)
-            pygame.draw.rect(screen, gray, cell, 1)
-
-
-def draw_cells():
-    current_generation: np.ndarray = board.get_current_generation()
-    for y in range(n_cells_y):
-        for x in range(n_cells_x):
-            cell = pygame.Rect(x * cell_width, y * cell_height, cell_width, cell_height)
-            if current_generation[x, y] == 1:
-                pygame.draw.rect(screen, black, cell)
-
+board.randomize_board()
 
 running = True
 while running:
-    screen.fill(white)
-    draw_grid()
-    draw_cells()
-    draw_button()
-    pygame.display.flip()
+    renderer.draw(board.current_generation)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if (
-                    button_x <= event.pos[0] <= button_x + button_width
-                    and button_y <= event.pos[1] <= button_y + button_height
+                    next_generation_button.x <= event.pos[0] <= next_generation_button.x + next_generation_button.width
+                    and next_generation_button.y <= event.pos[
+                1] <= next_generation_button.y + next_generation_button.height
             ):
                 board.next_generation()
             else:

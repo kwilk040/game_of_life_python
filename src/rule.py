@@ -151,6 +151,7 @@ class _Utils:
 
     @staticmethod
     def convert_rulestring_to_birth_survival(rulestring: str) -> _BirthSurvival:
+        # TODO: implement rulestring validation
         parsed_rulestring: list[str] = list(map(_Utils.__remove_alpha, rulestring.split("/")))
         return _Utils.__map_list_of_strings_to_list_of_ints(
             list(parsed_rulestring[0])), _Utils.__map_list_of_strings_to_list_of_ints(list(parsed_rulestring[1]))
