@@ -31,6 +31,9 @@ class Button:
         self.color = color
         self.text = text
 
+    def is_clicked(self, event_pos_x: int, event_pos_y: int) -> bool:
+        return self.x <= event_pos_x <= self.x + self.width and self.y <= event_pos_y <= self.y + self.height
+
 
 @dataclass
 class RendererSettings:

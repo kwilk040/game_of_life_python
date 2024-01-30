@@ -58,7 +58,7 @@ button_x, button_y = (width - button_width) // 2, height - button_height - 10
 
 next_generation_button: Button = Button(button_x, button_y, button_width, button_height, Color.MUTED, "Next generation")
 
-ruleset: Ruleset = RulesetFactory.get_ruleset(Rule.CONWAYS_LIFE)
+ruleset: Ruleset = RulesetFactory.get_ruleset(Rule.DAY_AND_NIGHT)
 board: Board = Board(n_cells_x, n_cells_y, ruleset)
 renderer_settings: RendererSettings = RendererSettings(height, width, n_cells_x, n_cells_y, cell_height, cell_width)
 renderer: PygameRenderer = PygameRenderer(screen, renderer_settings, [next_generation_button])
@@ -73,11 +73,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if (
-                    next_generation_button.x <= event.pos[0] <= next_generation_button.x + next_generation_button.width
-                    and next_generation_button.y <= event.pos[
-                1] <= next_generation_button.y + next_generation_button.height
-            ):
+            if next_generation_button.is_clicked(event.pos[0], event.pos[1]):
                 board.next_generation()
             else:
                 x, y = event.pos[0] // cell_width, event.pos[1] // cell_height
