@@ -12,3 +12,7 @@ display_coverage:
 	firefox htmlcov/index.html &
 
 run_tests_and_display_coverage: run_tests_with_coverage display_coverage
+
+install:
+	python3.12 -m venv .venv
+	.venv/bin/pip install -r requirements.txt
