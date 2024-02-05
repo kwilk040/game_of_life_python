@@ -23,16 +23,25 @@ class Color(Enum):
 
 
 class Button:
-    def __init__(self, x: int, y: int, width: int, height: int, color: Color, text: str):
+    def __init__(self, x: int, y: int, width: int, height: int, color: Color, label: str, text_color: Color):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.color = color
-        self.text = text
+        self.label = label
+        self.text_color = text_color
 
     def is_clicked(self, event_pos_x: int, event_pos_y: int) -> bool:
         return self.x <= event_pos_x <= self.x + self.width and self.y <= event_pos_y <= self.y + self.height
+
+
+class ButtonFactory:
+    def __init__(self, height: int):
+        self.height = height
+
+    def create_button(self, x: int, width: int, color: Color, label: str, text_color: Color) -> Button:
+        return Button(x, self.height - 60, width, 50, color, label, text_color)
 
 
 @dataclass
@@ -55,7 +64,7 @@ class PygameRenderer:
     def __draw_button(self, button: Button):
         pygame.draw.rect(self.screen, button.color.value, (button.x, button.y, button.width, button.height))
         font = pygame.font.Font(None, 36)
-        text = font.render(button.text, True, Color.TEXT.value)
+        text = font.render(button.label, True, button.text_color.value)
         text_rect = text.get_rect(
             center=(button.x + button.width // 2, button.y + button.height // 2)
         )
