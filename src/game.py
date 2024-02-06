@@ -36,10 +36,13 @@
 
 import pygame
 import argparse
+import logging
 
 from rule import Rule, Ruleset, RulesetFactory
-from board import Board
+from board import Board, BoardPersistence
 from ui import RendererSettings, PygameRenderer, Color, Button, ButtonFactory
+
+logging.root.setLevel(logging.NOTSET)
 
 parser: argparse = argparse.ArgumentParser(description='Game Of Life')
 parser.add_argument('-r', '--ruleset', required=False, type=str,
@@ -66,6 +69,8 @@ if args.ruleset is not None:
 else:
     ruleset: Ruleset = RulesetFactory.get_ruleset(Rule.CONWAYS_LIFE)
 
+ruleset_name: str = ruleset.get_name() if ruleset.get_rule() is not Rule.CUSTOM else ruleset.get_rulestring()
+
 next_generation_button: Button = button_factory.create_button((width - 200) // 2, 200, Color.MUTED, "Next generation",
                                                               Color.TEXT)
 start_stop_button: Button = button_factory.create_button(10, 130, Color.PINE, "Start", Color.BASE)
@@ -74,7 +79,7 @@ clear_button: Button = button_factory.create_button(150, 70, Color.MUTED,
 randomize_button: Button = button_factory.create_button(230, 160, Color.MUTED,
                                                         "Randomize", Color.TEXT)
 rule_button: Button = button_factory.create_button(610, 380, Color.MUTED,
-                                                   ruleset.get_name(), Color.TEXT)
+                                                   ruleset_name, Color.TEXT)
 
 board: Board = Board(n_cells_x, n_cells_y, ruleset)
 renderer_settings: RendererSettings = RendererSettings(height, width, n_cells_x, n_cells_y, cell_height, cell_width)
@@ -126,6 +131,18 @@ while running:
             else:
                 x, y = event.pos[0] // cell_width, event.pos[1] // cell_height
                 board.change_cell_state(x, y)
+                break
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_s:
+                BoardPersistence.save(board)
+            if event.key == pygame.K_l:
+                new_ruleset: str = BoardPersistence.load(board)
+                ruleset = RulesetFactory.get_custom_ruleset(new_ruleset)
+                board.update_ruleset(ruleset)
+                paused = True
+                start_stop_button.label = "Start"
+                start_stop_button.color = Color.PINE
+                rule_button.label = new_ruleset
                 break
     clock.tick(60)
 

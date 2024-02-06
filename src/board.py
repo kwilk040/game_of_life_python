@@ -1,4 +1,11 @@
+import time
+import logging
+from io import StringIO
+
 import numpy as np
+import tkinter
+import tkinter.filedialog
+import logging
 from cell import CellState
 from rule import Ruleset
 
@@ -50,3 +57,66 @@ class Board:
 
     def update_ruleset(self, ruleset: Ruleset):
         self.ruleset = ruleset
+
+    def set_current_generation(self, new_generation: np.ndarray):
+        self.current_generation = new_generation
+
+
+class BoardPersistence:
+
+    @staticmethod
+    def load(board: Board) -> str:
+        top = tkinter.Tk()
+        top.withdraw()
+        file_name = tkinter.filedialog.askopenfilename(parent=top)
+        top.destroy()
+
+        if file_name == ():
+            logging.error("No file selected")
+            raise Exception()
+
+        try:
+            reader = open(f'{file_name}', 'r')
+        except IOError as err:
+            logging.error(f'Could not open file {file_name}. Cause: {err}')
+            raise Exception()
+        else:
+            with reader:
+                name: str = reader.readline().replace("#Name:", "").strip()
+                rulestring: str = reader.readline().replace("#Rulestring:", "").strip()
+                board_as_string: list[str] = reader.readlines()
+
+                array_content: list[list[int]] = [[1 if char == '*' else 0 for char in line] for line in
+                                                  board_as_string]
+
+                new_generation: np.ndarray = np.fliplr(np.rot90(np.array(array_content), 3))
+                board.set_current_generation(new_generation)
+                logging.info(f'Loaded {name} with rulestring: {rulestring}')
+                return rulestring
+
+    @staticmethod
+    def save(board: Board):
+        content: StringIO = StringIO()
+        current_timestamp: int = int(time.time())
+        filename: str = f'{current_timestamp}.pylife'
+        rulestring = board.ruleset.get_rulestring()
+        content.write(f"#Name:{current_timestamp}\n")
+        content.write(f"#Rulestring:{rulestring}\n")
+
+        current_generation: np.ndarray = np.fliplr(
+            np.rot90(board.get_current_generation(), 3))
+
+        for x in current_generation:
+            for y in x:
+                content.write(f'{'*' if y == 1 else '.'}')
+            content.write('\n')
+
+        try:
+            writer = open(f'saved/{filename}', 'w')
+        except IOError as err:
+            logging.error(f"Could not save {filename}. Cause: {err}.")
+            return
+        else:
+            with writer:
+                writer.write(content.getvalue())
+                logging.info(f"Pattern successfully saved to {filename}.")

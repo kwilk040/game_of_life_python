@@ -35,9 +35,10 @@ class Rule(Enum):
 
 
 class Ruleset(ABC):
-    def __init__(self, birth_survival: _BirthSurvival, rule: Rule):
+    def __init__(self, birth_survival: _BirthSurvival, rulestring: str, rule: Rule):
         self.birth = birth_survival[0]
         self.survival = birth_survival[1]
+        self.rulestring = rulestring
         self.rule = rule
 
     def apply(self, cell_state: CellState, neighbours: int) -> CellState:
@@ -52,6 +53,9 @@ class Ruleset(ABC):
 
     def get_name(self):
         return self.__class__.__name__.replace("Ruleset", "")
+
+    def get_rulestring(self):
+        return self.rulestring
 
     def __apply_ruleset_for_alive_cell(self, neighbours: int) -> CellState:
         return (
@@ -68,62 +72,74 @@ class Ruleset(ABC):
 
 class ConwaysLifeRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B3/S23"), Rule.CONWAYS_LIFE)
+        rulestring: str = "B3/S23"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.CONWAYS_LIFE)
 
 
 class DayAndNightRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B3678/S34678"), Rule.DAY_AND_NIGHT)
+        rulestring: str = "B3678/S34678"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring,
+                         Rule.DAY_AND_NIGHT)
 
 
 class MazeRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B3/S12345"), Rule.MAZE)
+        rulestring: str = "B3/S12345"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.MAZE)
 
 
 class IceballsRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B25678/S5678"), Rule.ICEBALLS)
+        rulestring: str = "B25678/S5678"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.ICEBALLS)
 
 
 class LifeWithoutDeathRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B3/S012345678"), Rule.LIFE_WITHOUT_DEATH)
+        rulestring: str = "B3/S012345678"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.LIFE_WITHOUT_DEATH)
 
 
 class SeedsRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B2/S"), Rule.SEEDS)
+        rulestring: str = "B2/S"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.SEEDS)
 
 
 class HTreesRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B1/S012345678"), Rule.H_TREES)
+        rulestring: str = "B1/S012345678"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.H_TREES)
 
 
 class ServiettesRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B234/S"), Rule.SERVIETTES)
+        rulestring: str = "B234/S"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.SERVIETTES)
 
 
 class BacteriaRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B34/S456"), Rule.BACTERIA)
+        rulestring: str = "B34/S456"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.BACTERIA)
 
 
 class PedestrianLifeRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B38/S23"), Rule.PEDESTRIAN_LIFE)
+        rulestring: str = "B38/S23"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.PEDESTRIAN_LIFE)
 
 
 class PulsarLifeRuleset(Ruleset):
     def __init__(self):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival("B3/S238"), Rule.PULSAR_LIFE)
+        rulestring: str = "B3/S238"
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.PULSAR_LIFE)
 
 
 class CustomRuleset(Ruleset):
     def __init__(self, rulestring: str):
-        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), Rule.CUSTOM)
+        super().__init__(_Utils.convert_rulestring_to_birth_survival(rulestring), rulestring, Rule.CUSTOM)
 
 
 class RulesetFactory:
