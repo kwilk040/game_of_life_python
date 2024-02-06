@@ -136,13 +136,19 @@ while running:
             if event.key == pygame.K_s:
                 BoardPersistence.save(board)
             if event.key == pygame.K_l:
-                new_ruleset: str = BoardPersistence.load(board)
-                ruleset = RulesetFactory.get_custom_ruleset(new_ruleset)
-                board.update_ruleset(ruleset)
-                paused = True
-                start_stop_button.label = "Start"
-                start_stop_button.color = Color.PINE
-                rule_button.label = new_ruleset
+                try:
+                    new_ruleset: str = BoardPersistence.load(board)
+                    ruleset = RulesetFactory.get_custom_ruleset(new_ruleset)
+                    board.update_ruleset(ruleset)
+                    paused = True
+                    start_stop_button.label = "Start"
+                    start_stop_button.color = Color.PINE
+                    rule_button.label = new_ruleset
+                except IOError as err:
+                    logging.warning(err)
+                except ValueError as err:
+                    logging.warning(err)
+
                 break
     clock.tick(60)
 

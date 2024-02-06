@@ -72,14 +72,12 @@ class BoardPersistence:
         top.destroy()
 
         if file_name == ():
-            logging.error("No file selected")
-            raise Exception()
+            raise ValueError("No file selected")
 
         try:
             reader = open(f'{file_name}', 'r')
-        except IOError as err:
-            logging.error(f'Could not open file {file_name}. Cause: {err}')
-            raise Exception()
+        except IOError:
+            raise IOError(f'Could not open file {file_name}.')
         else:
             with reader:
                 name: str = reader.readline().replace("#Name:", "").strip()
