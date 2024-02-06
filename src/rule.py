@@ -1,8 +1,8 @@
 import re
-
 from abc import ABC
-from cell import CellState
 from enum import Enum
+
+from cell import CellState
 
 type _BirthSurvival = tuple[list[int], list[int]]
 

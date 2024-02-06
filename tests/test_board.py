@@ -1,10 +1,11 @@
 import unittest
-from ddt import ddt, data
 
 import numpy as np
+from ddt import ddt, data
+
 from src.board import Board
-from src.rule import Rule, Ruleset, RulesetFactory
 from src.cell import CellState
+from src.rule import Rule, Ruleset, RulesetFactory
 
 
 @ddt

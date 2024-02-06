@@ -1,11 +1,11 @@
-import time
 import logging
+import time
+import tkinter
+import tkinter.filedialog
 from io import StringIO
 
 import numpy as np
-import tkinter
-import tkinter.filedialog
-import logging
+
 from cell import CellState
 from rule import Ruleset
 

@@ -1,7 +1,9 @@
 import unittest
+
 from ddt import ddt, data
-from src.rule import Rule, Ruleset, RulesetFactory
+
 from src.cell import CellState
+from src.rule import Rule, Ruleset, RulesetFactory
 
 
 @ddt
