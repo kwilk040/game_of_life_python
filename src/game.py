@@ -35,10 +35,16 @@
 # 3. Short description of the changes. Which design patterns you used and how you applied them.
 
 import pygame
+import argparse
 
 from rule import Rule, Ruleset, RulesetFactory
 from board import Board
 from ui import RendererSettings, PygameRenderer, Color, Button, ButtonFactory
+
+parser: argparse = argparse.ArgumentParser(description='Game Of Life')
+parser.add_argument('-r', '--ruleset', required=False, type=str,
+                    help='Custom ruleset in birth/survival notation. Example: B3/S23.')
+args = parser.parse_args()
 
 # Initialize Pygame
 pygame.init()
@@ -53,7 +59,11 @@ cell_width = width // n_cells_x
 cell_height = height // n_cells_y
 
 button_factory: ButtonFactory = ButtonFactory(height)
-ruleset: Ruleset = RulesetFactory.get_ruleset(Rule.H_TREES)
+
+if args.ruleset is not None:
+    ruleset: Ruleset = RulesetFactory.get_custom_ruleset(args.ruleset)
+else:
+    ruleset: Ruleset = RulesetFactory.get_ruleset(Rule.CONWAYS_LIFE)
 
 next_generation_button: Button = button_factory.create_button((width - 200) // 2, 200, Color.MUTED, "Next generation",
                                                               Color.TEXT)
@@ -63,7 +73,7 @@ clear_button: Button = button_factory.create_button(150, 70, Color.MUTED,
 randomize_button: Button = button_factory.create_button(230, 160, Color.MUTED,
                                                         "Randomize", Color.TEXT)
 rule_button: Button = button_factory.create_button(610, 380, Color.MUTED,
-                                                   ruleset.__class__.__name__.replace("Ruleset", ""), Color.TEXT)
+                                                   ruleset.get_name(), Color.TEXT)
 
 board: Board = Board(n_cells_x, n_cells_y, ruleset)
 renderer_settings: RendererSettings = RendererSettings(height, width, n_cells_x, n_cells_y, cell_height, cell_width)
@@ -110,7 +120,7 @@ while running:
                     ruleset = RulesetFactory.get_ruleset(ruleset.get_rule().next())
                 if event.button == 3:
                     ruleset = RulesetFactory.get_ruleset(ruleset.get_rule().previous())
-                rule_button.label = ruleset.__class__.__name__.replace("Ruleset", "")
+                rule_button.label = ruleset.get_name()
                 board.update_ruleset(ruleset)
             else:
                 x, y = event.pos[0] // cell_width, event.pos[1] // cell_height

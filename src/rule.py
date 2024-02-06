@@ -1,3 +1,5 @@
+import re
+
 from abc import ABC
 from cell import CellState
 from enum import Enum
@@ -48,6 +50,9 @@ class Ruleset(ABC):
     def get_rule(self):
         return self.rule
 
+    def get_name(self):
+        return self.__class__.__name__.replace("Ruleset", "")
+
     def __apply_ruleset_for_alive_cell(self, neighbours: int) -> CellState:
         return (
             CellState.ALIVE
@@ -61,7 +66,7 @@ class Ruleset(ABC):
         )
 
 
-class ConwaysRuleset(Ruleset):
+class ConwaysLifeRuleset(Ruleset):
     def __init__(self):
         super().__init__(_Utils.convert_rulestring_to_birth_survival("B3/S23"), Rule.CONWAYS_LIFE)
 
@@ -127,7 +132,7 @@ class RulesetFactory:
 
         match rule:
             case Rule.CONWAYS_LIFE:
-                return ConwaysRuleset()
+                return ConwaysLifeRuleset()
             case Rule.DAY_AND_NIGHT:
                 return DayAndNightRuleset()
             case Rule.MAZE:
@@ -157,6 +162,8 @@ class RulesetFactory:
 
 
 class _Utils:
+    birth_survival_notation_regex: re.Pattern = re.compile(r'^B[0-8]{0,9}/S[0-8]{0,9}$')
+
     @staticmethod
     def __remove_alpha(param: str) -> str:
         return ''.join(filter(str.isdigit, param))
@@ -167,7 +174,9 @@ class _Utils:
 
     @staticmethod
     def convert_rulestring_to_birth_survival(rulestring: str) -> _BirthSurvival:
-        # TODO: implement rulestring validation
+        match: re.Match = _Utils.birth_survival_notation_regex.match(rulestring)
+        if not match:
+            raise ValueError("Invalid rulestring.")
         parsed_rulestring: list[str] = list(map(_Utils.__remove_alpha, rulestring.split("/")))
         return _Utils.__map_list_of_strings_to_list_of_ints(
             list(parsed_rulestring[0])), _Utils.__map_list_of_strings_to_list_of_ints(list(parsed_rulestring[1]))
