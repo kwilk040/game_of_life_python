@@ -48,6 +48,7 @@ args = parser.parse_args()
 
 # Initialize Pygame
 pygame.init()
+clock: pygame.time.Clock = pygame.time.Clock()
 
 # Screen dimensions
 width, height = 1000, 1000
@@ -126,5 +127,6 @@ while running:
                 x, y = event.pos[0] // cell_width, event.pos[1] // cell_height
                 board.change_cell_state(x, y)
                 break
+    clock.tick(60)
 
 pygame.quit()
